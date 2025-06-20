@@ -261,9 +261,27 @@ document.addEventListener("DOMContentLoaded", () => {
    * This creates a smooth typewriter-like effect as the user scrolls.
    */
 
-  // Set initial state for model container
+  // Set initial states for various elements
   gsap.set(".model-container", {
     scale: 0.8,
+  });
+
+  // Set header-2 to be invisible initially (opacity animated in at 45% progress)
+  gsap.set(".header-2", {
+    opacity: 0,
+  });
+
+  // Set initial tooltip positioning
+  gsap.set(".tooltip:nth-child(2)", {
+    position: "absolute",
+    bottom: "2rem",
+    left: "2rem",
+  });
+
+  gsap.set(".tooltip:nth-child(3)", {
+    position: "absolute",
+    top: "2rem",
+    right: "2rem",
   });
 
   ScrollTrigger.create({
@@ -700,7 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ScrollTrigger.create({
     trigger: ".product-overview", // Element that triggers the animation
     start: "top top", // Start when section reaches top of viewport
-    end: `+=${window.innerHeight * 1.5}`, // End after 1.5 viewport heights (right after tooltips)
+    end: `+=${window.innerHeight * 1.8}`, // End after 1.8 viewport heights (20% longer timeline)
     pin: true, // Pin the section during scroll
     pinSpacing: true, // Maintain spacing around pinned element
     scrub: 1, // Smooth scrubbing (animation follows scroll)
@@ -718,13 +736,30 @@ document.addEventListener("DOMContentLoaded", () => {
       currentScrollProgress = progress;
 
       /**
-       * 3D MODEL ENTRANCE ANIMATION (0% - 12% progress)
+       * MODEL GRADIENT FADE (17% progress)
+       * ==================================
+       *
+       * Hide the model gradient overlay at 17% scroll to improve can animation visibility
+       * (Adjusted for 20% longer timeline: 20% * 0.833 = 17%)
+       */
+      const gradientOpacity = progress >= 0.17 ? 0 : 1;
+      gsap.to(".styles__model_gradient", {
+        opacity: gradientOpacity,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+
+
+
+      /**
+       * 3D MODEL ENTRANCE ANIMATION (0% - 10% progress)
        * ===============================================
        *
        * The 3D model moves up from below the viewport to its final position
+       * (Adjusted for 20% longer timeline: 12% * 0.833 = 10%)
        */
       if (model && finalModelPosition && modelSize) {
-        const entranceProgress = Math.max(0, Math.min(1, progress / 0.12)); // 0-12% of scroll
+        const entranceProgress = Math.max(0, Math.min(1, progress / 0.10)); // 0-10% of scroll
         const currentY =
           finalModelPosition.y - (1 - entranceProgress) * modelSize.y * 1.5;
 
@@ -736,48 +771,69 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       /**
-       * MODEL CONTAINER REVEAL (15% - 25% progress)
-       * ===========================================
+       * MODEL CONTAINER REVEAL & STICKY EFFECT (12% - 82% progress)
+       * ===========================================================
        *
-       * The 3D model container scales up smoothly with header-2 animation
+       * Handle both scale animation and sticky behavior in one place to avoid conflicts
+       * (Adjusted for 20% longer timeline: 15% * 0.833 = 12%, 99% * 0.833 = 82%)
        */
-      const modelProgress = Math.max(0, Math.min(1, (progress - 0.15) / 0.1));
-      gsap.to(".model-container", {
-        scale: progress < 0.35 ? 0.8 : 0.8 + 0.2 * modelProgress, // Scale from 0.8 to 1.0
-        duration: 0.2,
-        ease: "power2.out",
-      });
+      const modelProgress = Math.max(0, Math.min(1, (progress - 0.12) / 0.08));
+      const modelScale = progress < 0.29 ? 0.8 : 0.8 + 0.2 * modelProgress; // Scale from 0.8 to 1.0
+      
+      if (progress >= 0.82) {
+        // At 99%: sticky behavior with full viewport size
+        gsap.to(".model-container", {
+          scale: modelScale,
+          zIndex: 1000,
+          width: "100vw",
+          height: "100vh",
+          duration: 0.2,
+          ease: "power2.out",
+        });
+      } else {
+        // Before 99%: normal scaling behavior
+        gsap.to(".model-container", {
+          scale: modelScale,
+          zIndex: "auto",
+          width: "auto", 
+          height: "auto",
+          duration: 0.2,
+          ease: "power2.out",
+        });
+      }
 
       /**
-       * HEADER 1 SLIDE-OUT ANIMATION (30% - 65% progress)
+       * HEADER 1 SLIDE-OUT ANIMATION (25% - 54% progress)
        * ===============================================
        *
        * The first header slides out to the left as the user scrolls
+       * (Adjusted for 20% longer timeline: 30% * 0.833 = 25%, 65% * 0.833 = 54%)
        */
-      const headerProgress = Math.max(0, Math.min(1, (progress - 0.3) / 0.35));
+      const headerProgress = Math.max(0, Math.min(1, (progress - 0.25) / 0.29));
       gsap.to(".header-1", {
         xPercent:
-          progress < 0.2
-            ? 0 // Stay in place before 30%
-            : progress > 0.8
-            ? -100 // Fully off-screen after 65%
-            : -100 * headerProgress, // Gradual slide from 30% to 65%
+          progress < 0.17
+            ? 0 // Stay in place before 25%
+            : progress > 0.67
+            ? -100 // Fully off-screen after 54%
+            : -100 * headerProgress, // Gradual slide from 25% to 54%
         duration: 0.4,
         ease: "linear",
       });
 
       /**
-       * CIRCULAR MASK REVEAL (45% - 60% progress)
+       * CIRCULAR MASK REVEAL (37% - 50% progress)
        * =========================================
        *
        * A circular mask expands to reveal the second header underneath
+       * (Adjusted for 20% longer timeline: 45% * 0.833 = 37%, 60% * 0.833 = 50%)
        */
       const maskSize =
-        progress < 0.6
-          ? 0 // Hidden before 45%
-          : progress > 0.6
-          ? 100 // Fully revealed after 60%
-          : (100 * (progress - 0.45)) / 0.15; // Expand from 45% to 60%
+        progress < 0.37
+          ? 0 // Hidden before 37%
+          : progress > 0.50
+          ? 100 // Fully revealed after 50%
+          : (100 * (progress - 0.37)) / 0.13; // Expand from 37% to 50%
 
       gsap.to(".circular-mask", {
         clipPath: `circle(${maskSize}% at 50% 50%)`, // CSS clip-path for circular reveal
@@ -786,27 +842,42 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       /**
-       * HEADER 2 SLIDE-THROUGH ANIMATION (45% - 90% progress)
+       * HEADER 2 SLIDE-THROUGH ANIMATION (37% - 75% progress)
        * ====================================================
        *
        * The second header slowly slides from right to left across a longer scroll range
+       * (Adjusted for 20% longer timeline: 45% * 0.833 = 37%, 90% * 0.833 = 75%)
        */
       let header2XPercent;
-      if (progress < 0.45) {
+      if (progress < 0.37) {
         header2XPercent = 100; // Start off-screen right
-      } else if (progress > 0.9) {
+      } else if (progress > 0.75) {
         header2XPercent = -100; // End off-screen left
       } else {
-        // Gradually slide from right (100%) to left (-100%) over 45% of scroll
-        const slideProgress = (progress - 0.45) / 0.45; // 0 to 1 over the 45% range
+        // Gradually slide from right (100%) to left (-100%) over 38% of scroll
+        const slideProgress = (progress - 0.37) / 0.38; // 0 to 1 over the 38% range
         header2XPercent = 100 - 200 * slideProgress; // 100 to -100
       }
 
       gsap.to(".header-2", {
         xPercent: header2XPercent,
-        zIndex: progress >= 0.45 ? 10 : 1, // Bring to front during mask reveal
+        zIndex: progress >= 0.37 ? 10 : 1, // Bring to front during mask reveal
         duration: 0.3, // Shorter duration for smoother follow
         ease: "none", // Linear easing for consistent scroll mapping
+      });
+
+      /**
+       * HEADER 2 OPACITY ANIMATION (37% progress)
+       * =========================================
+       *
+       * Fade in header-2 opacity just before the mask reveal animation starts
+       * (Adjusted for 20% longer timeline: 45% * 0.833 = 37%)
+       */
+      const header2Opacity = progress >= 0.37 ? 1 : 0;
+      gsap.to(".header-2", {
+        opacity: header2Opacity,
+        duration: 0.3,
+        ease: "power2.out",
       });
 
       // Tooltip animations are now handled by dedicated ScrollTrigger instances
@@ -833,17 +904,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       /**
-       * HEADER 2 COLOR TRANSITION (45% - 60% progress)
+       * HEADER 2 COLOR TRANSITION (37% - 50% progress)
        * =============================================
        *
        * The second header transitions from white to black as the mask reveals it
+       * (Adjusted for 20% longer timeline: 45% * 0.833 = 37%, 60% * 0.833 = 50%)
        */
       const colorProgress =
-        progress < 0.45
-          ? 0 // White before 45%
-          : progress > 0.6
-          ? 1 // Black after 60%
-          : (progress - 0.45) / 0.15; // Transition from 45% to 60%
+        progress < 0.37
+          ? 0 // White before 37%
+          : progress > 0.50
+          ? 1 // Black after 50%
+          : (progress - 0.37) / 0.13; // Transition from 37% to 50%
 
       const colorValue = Math.round(255 * (1 - colorProgress)); // 255 = white, 0 = black
       gsap.to(".header-2", {
@@ -873,12 +945,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const trigger = ScrollTrigger.create({
         trigger: ".product-overview",
         start: "top top",
-        end: `+=${window.innerHeight * 1.5}`, // Match main scroll animation
+        end: `+=${window.innerHeight * 1.8}`, // Match main scroll animation (20% longer)
         scrub: false, // No scrubbing - discrete enter/leave animations
         
         onUpdate: ({ progress }) => {
-          // Tooltip visibility window: 80% - 99% of scroll progress
-          const isInTooltipRange = progress >= 0.8 && progress <= 0.99;
+          // Tooltip visibility window: 70% - 89% of scroll progress (10% earlier)
+          const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
           
           if (isInTooltipRange) {
             // Play tooltip animation when entering the range
@@ -891,25 +963,25 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Additional enter/leave callbacks for reliability
         onEnter: ({ progress }) => {
-          if (progress >= 0.8) {
+          if (progress >= 0.7) {
             timeline.play();
           }
         },
         
         onLeave: ({ progress }) => {
-          if (progress > 0.99) {
+          if (progress > 0.89) {
             timeline.reverse();
           }
         },
         
         onEnterBack: ({ progress }) => {
-          if (progress >= 0.8 && progress <= 0.99) {
+          if (progress >= 0.7 && progress <= 0.89) {
             timeline.play();
           }
         },
         
         onLeaveBack: ({ progress }) => {
-          if (progress < 0.8) {
+          if (progress < 0.7) {
             timeline.reverse();
           }
         }
