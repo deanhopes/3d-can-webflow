@@ -384,10 +384,9 @@ gsap.to(element, { color: "red" });
 | 0% - 15%       | Initial state    | Model container at scale 0.8              |
 | 15% - 25%      | Model reveal     | Model container scales to 1.0             |
 | 30% - 65%      | Header 1 exit    | `.header-1` slides left (-100%)           |
-| 45% - 60%      | Mask reveal      | `.circular-mask` expands (0% to 100%)     |
+| 47% - 60%      | Mask reveal      | `.circular-mask` expands (0% to 100%)     |
 | 45% - 90%      | Header 2 journey | `.header-2` slides right to left          |
-| 45% - 47%      | Tooltip 1        | First tooltip content reveals             |
-| 47% - 49%      | Tooltip 2        | Second tooltip content reveals            |
+| 70% - 89%      | Tooltip 1 & 2    | Both tooltip contents reveal              |
 | 0% - 100%      | Model rotation   | Continuous Y-axis rotation (2 full turns) |
 
 ### 🎬 3D Model Entrance Animation
@@ -405,5 +404,20 @@ The 3D model now features a sophisticated entrance animation that creates the il
 - `finalModelPosition` - Stores the target position after entrance
 - `currentScrollProgress` - Tracks scroll state for resize handling
 - `applyEntranceAnimationState()` - Handles resize repositioning
+
+### 🛠 Recent Enhancements
+
+#### Circular Mask Timing Adjustment
+- **Previous**: 45% - 60% progress range
+- **Current**: 47% - 60% progress range (moved 2% later for better choreography)
+
+#### Tooltip Initialization Fix
+Enhanced tooltip system to handle page refresh scenarios:
+- Added `onRefresh` callback to ScrollTrigger instances
+- Manual progress calculation for reliable initialization
+- Immediate state setting based on current scroll position
+- 200ms timeout for proper DOM readiness
+
+This ensures tooltips appear correctly regardless of where users refresh the page in the scroll timeline.
 
 Remember: Your goal is to enhance the existing 3D scene experience while maintaining the sophisticated animation choreography already in place. Every modification should feel like a natural extension of the existing system.

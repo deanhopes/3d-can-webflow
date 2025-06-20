@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create timelines after text elements exist
     createTooltipTimelines();
-    
+
     // Create tooltip ScrollTriggers after timelines are ready
     setTimeout(createTooltipScrollTriggers, 50);
   }
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear existing timelines and ScrollTriggers
       tooltipTimelines.forEach((timeline) => timeline.kill());
       tooltipTimelines = [];
-      
+
       tooltipScrollTriggers.forEach((trigger) => trigger.kill());
       tooltipScrollTriggers = [];
 
@@ -749,8 +749,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ease: "power2.out",
       });
 
-
-
       /**
        * 3D MODEL ENTRANCE ANIMATION (0% - 10% progress)
        * ===============================================
@@ -759,7 +757,7 @@ document.addEventListener("DOMContentLoaded", () => {
        * (Adjusted for 20% longer timeline: 12% * 0.833 = 10%)
        */
       if (model && finalModelPosition && modelSize) {
-        const entranceProgress = Math.max(0, Math.min(1, progress / 0.10)); // 0-10% of scroll
+        const entranceProgress = Math.max(0, Math.min(1, progress / 0.1)); // 0-10% of scroll
         const currentY =
           finalModelPosition.y - (1 - entranceProgress) * modelSize.y * 1.5;
 
@@ -779,7 +777,7 @@ document.addEventListener("DOMContentLoaded", () => {
        */
       const modelProgress = Math.max(0, Math.min(1, (progress - 0.12) / 0.08));
       const modelScale = progress < 0.29 ? 0.8 : 0.8 + 0.2 * modelProgress; // Scale from 0.8 to 1.0
-      
+
       if (progress >= 0.82) {
         // At 99%: sticky behavior with full viewport size
         gsap.to(".model-container", {
@@ -795,7 +793,7 @@ document.addEventListener("DOMContentLoaded", () => {
         gsap.to(".model-container", {
           scale: modelScale,
           zIndex: "auto",
-          width: "auto", 
+          width: "auto",
           height: "auto",
           duration: 0.2,
           ease: "power2.out",
@@ -822,18 +820,18 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       /**
-       * CIRCULAR MASK REVEAL (37% - 50% progress)
+       * CIRCULAR MASK REVEAL (47% - 60% progress)
        * =========================================
        *
        * A circular mask expands to reveal the second header underneath
-       * (Adjusted for 20% longer timeline: 45% * 0.833 = 37%, 60% * 0.833 = 50%)
+       * (Moved 5% earlier: 52% - 5% = 47%, 65% - 5% = 60%)
        */
       const maskSize =
-        progress < 0.37
-          ? 0 // Hidden before 37%
-          : progress > 0.50
-          ? 100 // Fully revealed after 50%
-          : (100 * (progress - 0.37)) / 0.13; // Expand from 37% to 50%
+        progress < 0.47
+          ? 0 // Hidden before 47%
+          : progress > 0.6
+          ? 100 // Fully revealed after 60%
+          : (100 * (progress - 0.47)) / 0.13; // Expand from 47% to 60%
 
       gsap.to(".circular-mask", {
         clipPath: `circle(${maskSize}% at 50% 50%)`, // CSS clip-path for circular reveal
@@ -913,7 +911,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const colorProgress =
         progress < 0.37
           ? 0 // White before 37%
-          : progress > 0.50
+          : progress > 0.5
           ? 1 // Black after 50%
           : (progress - 0.37) / 0.13; // Transition from 37% to 50%
 
@@ -947,11 +945,11 @@ document.addEventListener("DOMContentLoaded", () => {
         start: "top top",
         end: `+=${window.innerHeight * 1.8}`, // Match main scroll animation (20% longer)
         scrub: false, // No scrubbing - discrete enter/leave animations
-        
+
         onUpdate: ({ progress }) => {
           // Tooltip visibility window: 70% - 89% of scroll progress (10% earlier)
           const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
-          
+
           if (isInTooltipRange) {
             // Play tooltip animation when entering the range
             timeline.play();
@@ -960,37 +958,74 @@ document.addEventListener("DOMContentLoaded", () => {
             timeline.reverse();
           }
         },
-        
+
+        // Initialize tooltip state on refresh based on current scroll position
+        onRefresh: ({ progress }) => {
+          const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
+          
+          if (isInTooltipRange) {
+            timeline.progress(1); // Show tooltip immediately if in range
+          } else {
+            timeline.progress(0); // Hide tooltip immediately if out of range
+          }
+        },
+
         // Additional enter/leave callbacks for reliability
         onEnter: ({ progress }) => {
           if (progress >= 0.7) {
             timeline.play();
           }
         },
-        
+
         onLeave: ({ progress }) => {
           if (progress > 0.89) {
             timeline.reverse();
           }
         },
-        
+
         onEnterBack: ({ progress }) => {
           if (progress >= 0.7 && progress <= 0.89) {
             timeline.play();
           }
         },
-        
+
         onLeaveBack: ({ progress }) => {
           if (progress < 0.7) {
             timeline.reverse();
           }
-        }
+        },
       });
-      
+
       // Store the ScrollTrigger instance for cleanup
       tooltipScrollTriggers.push(trigger);
     });
+
+    // Force initial state check after all triggers are created
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+      
+      // Double-check initial state after refresh
+      const productOverview = document.querySelector('.product-overview');
+      if (productOverview) {
+        const rect = productOverview.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const triggerTop = scrollTop + rect.top;
+        const currentScroll = scrollTop;
+        const endPoint = triggerTop + window.innerHeight * 1.8;
+        
+        if (currentScroll >= triggerTop && currentScroll <= endPoint) {
+          const progress = (currentScroll - triggerTop) / (window.innerHeight * 1.8);
+          const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
+          
+          tooltipTimelines.forEach((timeline) => {
+            if (isInTooltipRange) {
+              timeline.progress(1);
+            } else {
+              timeline.progress(0);
+            }
+          });
+        }
+      }
+    }, 200);
   }
-
-
 });

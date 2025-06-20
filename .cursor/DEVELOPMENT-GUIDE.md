@@ -10,10 +10,9 @@
 | 0% - 15%       | Initial state    | Model container at scale 0.8              |
 | 15% - 25%      | Model reveal     | Model container scales to 1.0             |
 | 30% - 65%      | Header 1 exit    | `.header-1` slides left (-100%)           |
-| 45% - 60%      | Mask reveal      | `.circular-mask` expands (0% to 100%)     |
+| 47% - 60%      | Mask reveal      | `.circular-mask` expands (0% to 100%)     |
 | 45% - 90%      | Header 2 journey | `.header-2` slides right to left          |
-| 45% - 47%      | Tooltip 1        | First tooltip content reveals             |
-| 47% - 49%      | Tooltip 2        | Second tooltip content reveals            |
+| 70% - 89%      | Tooltip 1 & 2    | Both tooltip contents reveal              |
 | 0% - 100%      | Model rotation   | Continuous Y-axis rotation (2 full turns) |
 
 ### Key Configuration Objects
@@ -142,6 +141,47 @@ if (model && finalModelPosition && modelSize) {
 // Adjust entrance timing by modifying the divisor (0.12 = 12% of scroll)
 // Adjust starting distance by modifying the multiplier (1.5 = 1.5x model height below)
 ```
+
+### 6. Fixing Tooltip Initialization Issues
+
+Recent enhancement to handle tooltip visibility on page refresh:
+
+```javascript
+// Enhanced tooltip initialization with manual progress calculation
+function createTooltipScrollTriggers() {
+  // ... existing timeline creation ...
+
+  // Force initial state check after all triggers are created
+  setTimeout(() => {
+    ScrollTrigger.refresh();
+    
+    // Manual progress calculation for reliable initialization
+    const productOverview = document.querySelector('.product-overview');
+    if (productOverview) {
+      const rect = productOverview.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const triggerTop = scrollTop + rect.top;
+      const currentScroll = scrollTop;
+      const endPoint = triggerTop + window.innerHeight * 1.8;
+      
+      if (currentScroll >= triggerTop && currentScroll <= endPoint) {
+        const progress = (currentScroll - triggerTop) / (window.innerHeight * 1.8);
+        const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
+        
+        tooltipTimelines.forEach((timeline) => {
+          if (isInTooltipRange) {
+            timeline.progress(1); // Show immediately
+          } else {
+            timeline.progress(0); // Hide immediately
+          }
+        });
+      }
+    }
+  }, 200);
+}
+```
+
+This fix ensures tooltips appear correctly when users refresh the page at any scroll position.
 
 ## 🚨 Critical Constraints Reminder
 
