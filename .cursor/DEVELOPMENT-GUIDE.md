@@ -142,9 +142,45 @@ if (model && finalModelPosition && modelSize) {
 // Adjust starting distance by modifying the multiplier (1.5 = 1.5x model height below)
 ```
 
-### 6. Fixing Tooltip Initialization Issues
+### 6. Adding New Text Animations
 
-Recent enhancement to handle tooltip visibility on page refresh:
+If you want to add new text animations (like header-caps or data attributes), follow this pattern:
+
+```javascript
+// 1. Set up SplitText
+const newTextSplit = new SplitText(".new-text", {
+  type: "chars", // or "words" or "lines"
+  charsClass: "char", // or wordsClass/linesClass
+});
+
+// 2. Wrap in spans
+newTextSplit.chars.forEach(
+  (char) => (char.innerHTML = `<span>${char.innerHTML}</span>`)
+);
+
+// 3. Set initial state
+gsap.set(".new-text .char > span", {
+  y: "100%", // or opacity: 0, etc.
+});
+
+// 4. Create ScrollTrigger
+ScrollTrigger.create({
+  trigger: ".new-text-container",
+  start: "top 80%",
+  onEnter: () => {
+    gsap.to(".new-text .char > span", {
+      y: "0%",
+      duration: 1,
+      ease: "power3.inOut",
+      stagger: 0.025,
+    });
+  },
+});
+```
+
+### 7. Tooltip Initialization Enhancement
+
+The current system includes robust tooltip handling:
 
 ```javascript
 // Enhanced tooltip initialization with manual progress calculation
@@ -181,7 +217,7 @@ function createTooltipScrollTriggers() {
 }
 ```
 
-This fix ensures tooltips appear correctly when users refresh the page at any scroll position.
+This ensures tooltips appear correctly when users refresh the page at any scroll position.
 
 ## 🚨 Critical Constraints Reminder
 
@@ -214,5 +250,23 @@ This fix ensures tooltips appear correctly when users refresh the page at any sc
 - Batch DOM reads/writes in `onUpdate` callbacks
 - Leverage `pin` for complex scroll sections
 - Use `invalidateOnRefresh` for responsive behavior
+
+## 🛠 Current Clean State
+
+As of the latest update, the codebase focuses on the core 3D scene experience:
+
+### ✅ Active Systems
+- **Main Header Animation** - `.header-1 h1` typewriter effect
+- **3D Model System** - Complete model loading, positioning, and rotation
+- **Scroll Animation Timeline** - Coordinated header transitions and mask reveals
+- **Tooltip System** - Interactive elements with proper refresh handling
+- **Smooth Scrolling** - Lenis integration with ScrollTrigger
+
+### ❌ Removed Systems
+- Header caps animations (removed for simplification)
+- Data attribute text animations (removed for simplification)  
+- Small text animations (removed for simplification)
+
+This clean state provides a solid foundation for adding new features while maintaining the sophisticated core animation system.
 
 This guide provides the technical foundation for enhancing the 3D scene while maintaining the sophisticated choreography already in place.

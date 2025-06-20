@@ -22,6 +22,10 @@ beanoss-spectacular-site.webflow/
 │   └── webflow.js (STATIC - DO NOT MODIFY)
 ├── css/ (STATIC - DO NOT MODIFY)
 ├── assets/models/ (STATIC - REFERENCE ONLY)
+├── .cursor/ ← Development documentation
+│   ├── DEVELOPMENT-GUIDE.md
+│   └── instructions.md
+├── README.md
 └── package.json (STATIC - DO NOT MODIFY)
 ```
 
@@ -35,19 +39,19 @@ beanoss-spectacular-site.webflow/
 
 ## 🎯 Current Implementation (scene.js)
 
-The `scene.js` file implements:
+The `scene.js` file implements a clean, focused 3D scene system:
 
 ### 1. **Animation System** (Lines 1-100)
 
 - GSAP plugins registration
 - Lenis smooth scrolling setup
-- Text splitting with SplitText
+- Text splitting with SplitText for main header
 
-### 2. **Text Animation Setup** (Lines 100-200)
+### 2. **Tooltip Text Setup** (Lines 100-200)
 
-- Header character splitting
 - Tooltip text preparation
 - Responsive text handling
+- Timeline creation for tooltip animations
 
 ### 3. **3D Scene Setup** (Lines 200-500)
 
@@ -61,12 +65,12 @@ The `scene.js` file implements:
 - Responsive positioning system
 - Material optimization
 
-### 5. **Scroll Animation System** (Lines 650-816)
+### 5. **Main Scroll Animation System** (Lines 650-900)
 
-- Main ScrollTrigger animation
-- Progress-based triggers
-- Header transitions, mask reveals, tooltip animations
-- 3D model rotation
+- Primary ScrollTrigger animation with pinning
+- Progress-based triggers for headers, masks, model
+- 3D model rotation and entrance animation
+- Tooltip scroll triggers with refresh handling
 
 ## 💻 Development Guidelines
 
@@ -95,10 +99,10 @@ function setModelPosition() {
 // ✅ GOOD: Descriptive constants
 const ANIMATION_DURATION = 1.5;
 const MOBILE_BREAKPOINT = 768;
-const TOOLTIP_REVEAL_TRIGGER = 0.45;
+const TOOLTIP_REVEAL_TRIGGER = 0.7;
 
 // ❌ AVOID: Magic numbers
-gsap.to(element, { duration: 1.5, delay: 0.45 });
+gsap.to(element, { duration: 1.5, delay: 0.7 });
 ```
 
 #### 3. **Early Returns**
@@ -173,31 +177,57 @@ ScrollTrigger.create({
 
 ## 🎨 Common Modification Patterns
 
-### Adding New Animations
+### Adding New Text Animations
 
-When adding new scroll-based animations, follow this pattern:
+When adding new text-based animations, follow this pattern:
 
 ```javascript
-// 1. Define animation configuration
-const newAnimationConfig = {
-  trigger: 0.7, // At 70% scroll progress
-  duration: 0.3, // 300ms duration
-  elements: [".new-element"],
-};
+// 1. Set up SplitText
+const newTextSplit = new SplitText(".new-element", {
+  type: "chars", // or "words" or "lines"
+  charsClass: "char",
+});
 
-// 2. Add to existing ScrollTrigger onUpdate
+// 2. Wrap in spans
+newTextSplit.chars.forEach(
+  (char) => (char.innerHTML = `<span>${char.innerHTML}</span>`)
+);
+
+// 3. Set initial state
+gsap.set(".new-element .char > span", {
+  y: "100%",
+});
+
+// 4. Create ScrollTrigger
+ScrollTrigger.create({
+  trigger: ".new-element-container",
+  start: "top 80%",
+  onEnter: () => {
+    gsap.to(".new-element .char > span", {
+      y: "0%",
+      duration: 1,
+      ease: "power3.inOut",
+      stagger: 0.025,
+    });
+  },
+});
+```
+
+### Adding New Scroll-Based Animations
+
+For new scroll-triggered effects, add to the main ScrollTrigger:
+
+```javascript
+// Add to existing ScrollTrigger onUpdate
 onUpdate: ({ progress }) => {
   // Existing animations...
 
-  // New animation
-  if (progress >= newAnimationConfig.trigger) {
-    const animProgress = Math.min(
-      1,
-      (progress - newAnimationConfig.trigger) / 0.1
-    );
-    gsap.to(newAnimationConfig.elements, {
+  // New animation at specific progress point
+  if (progress >= 0.8) {
+    const animProgress = Math.min(1, (progress - 0.8) / 0.1);
+    gsap.to(".new-element", {
       opacity: animProgress,
-      duration: newAnimationConfig.duration,
+      duration: 0.3,
       ease: "power2.out",
     });
   }
@@ -227,25 +257,6 @@ const modelConfig = {
   // Add new properties here
   newProperty: value,
 };
-```
-
-### Adding Tooltip Interactions
-
-To add new tooltips, extend the `tooltipSelectors` array:
-
-```javascript
-const tooltipSelectors = [
-  // Existing tooltips...
-  {
-    trigger: 0.49, // New trigger point
-    elements: [
-      ".tooltip:nth-child(4) .divider",
-      ".tooltip:nth-child(4) .icon",
-      ".tooltip:nth-child(4) .title .line > span",
-      ".tooltip:nth-child(4) .description .line > span",
-    ],
-  },
-];
 ```
 
 ## 🐛 Debugging Best Practices
@@ -391,7 +402,7 @@ gsap.to(element, { color: "red" });
 
 ### 🎬 3D Model Entrance Animation
 
-The 3D model now features a sophisticated entrance animation that creates the illusion of the can emerging from below the viewport:
+The 3D model features a sophisticated entrance animation:
 
 **Implementation Details:**
 - **Initial Position**: Model starts 1.5× its height below the final position
@@ -408,8 +419,8 @@ The 3D model now features a sophisticated entrance animation that creates the il
 ### 🛠 Recent Enhancements
 
 #### Circular Mask Timing Adjustment
-- **Previous**: 45% - 60% progress range
-- **Current**: 47% - 60% progress range (moved 2% later for better choreography)
+- **Previous**: 52% - 65% progress range
+- **Current**: 47% - 60% progress range (moved 5% earlier for better choreography)
 
 #### Tooltip Initialization Fix
 Enhanced tooltip system to handle page refresh scenarios:
@@ -417,6 +428,12 @@ Enhanced tooltip system to handle page refresh scenarios:
 - Manual progress calculation for reliable initialization
 - Immediate state setting based on current scroll position
 - 200ms timeout for proper DOM readiness
+
+#### Code Cleanup
+- **Removed**: Header caps animation system (simplified for focus)
+- **Removed**: Data attribute text animations (simplified for focus)
+- **Removed**: Small text animation system (simplified for focus)
+- **Maintained**: Core 3D scene and main header animation system
 
 This ensures tooltips appear correctly regardless of where users refresh the page in the scroll timeline.
 

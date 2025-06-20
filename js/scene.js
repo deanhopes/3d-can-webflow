@@ -18,7 +18,6 @@
 // Import required libraries for 3D rendering and animation
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import Lenis from "lenis";
 
 /**
@@ -26,8 +25,6 @@ import Lenis from "lenis";
  * This ensures all HTML elements are available for manipulation
  */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Hello World");
-
   /**
    * STEP 1: ANIMATION SYSTEM SETUP
    * ==============================
@@ -69,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
     charsClass: "char", // CSS class applied to each character wrapper
   });
 
+
+
   // Function to properly split tooltip text after layout is ready
   function initializeTooltipText() {
     // Force layout calculation by accessing offsetHeight
@@ -86,8 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const descriptionSplits = new SplitText(".tooltip .description p", {
       type: "lines",
       linesClass: "line",
-      // Force recalculation of line breaks
-      reduceWhiteSpace: false,
     });
 
     return { titleSplits, descriptionSplits };
@@ -148,6 +145,8 @@ document.addEventListener("DOMContentLoaded", () => {
   headerSplit.chars.forEach(
     (char) => (char.innerHTML = `<span>${char.innerHTML}</span>`)
   );
+
+
 
   // Note: Tooltip line wrapping is handled in the setTimeout above after layout is ready
 
@@ -271,6 +270,8 @@ document.addEventListener("DOMContentLoaded", () => {
     opacity: 0,
   });
 
+
+
   // Set initial tooltip positioning
   gsap.set(".tooltip:nth-child(2)", {
     position: "absolute",
@@ -283,6 +284,39 @@ document.addEventListener("DOMContentLoaded", () => {
     top: "2rem",
     right: "2rem",
   });
+
+  
+
+  ScrollTrigger.create({
+    trigger: ".product-overview",
+    start: "75% bottom", // Start when section is 75% visible from bottom
+    onEnter: () => {
+      // Animate header characters
+      gsap.to(".header-1 h1 .char > span", {
+        y: "0%", // Move to normal position
+        duration: 1,
+        ease: "power3.inOut",
+        stagger: 0.025, // Stagger creates typewriter effect
+      });
+    },
+    onLeaveBack: () => {
+      // Reverse header animation when scrolling back up
+      gsap.to(".header-1 h1 .char > span", {
+        y: "100%", // Move below visible area
+        duration: 1.5,
+        ease: "power3.inOut",
+        stagger: 0.025,
+      });
+    },
+  });
+
+  /**
+   * INITIAL HERO SECTION ANIMATIONS
+   * ===============================
+   *
+   * These animations trigger on page load or when scrolling into view
+   * for elements that are visible in the initial viewport
+   */
 
   ScrollTrigger.create({
     trigger: ".product-overview",
@@ -962,7 +996,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Initialize tooltip state on refresh based on current scroll position
         onRefresh: ({ progress }) => {
           const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
-          
+
           if (isInTooltipRange) {
             timeline.progress(1); // Show tooltip immediately if in range
           } else {
@@ -1003,20 +1037,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Force initial state check after all triggers are created
     setTimeout(() => {
       ScrollTrigger.refresh();
-      
+
       // Double-check initial state after refresh
-      const productOverview = document.querySelector('.product-overview');
+      const productOverview = document.querySelector(".product-overview");
       if (productOverview) {
         const rect = productOverview.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
         const triggerTop = scrollTop + rect.top;
         const currentScroll = scrollTop;
         const endPoint = triggerTop + window.innerHeight * 1.8;
-        
+
         if (currentScroll >= triggerTop && currentScroll <= endPoint) {
-          const progress = (currentScroll - triggerTop) / (window.innerHeight * 1.8);
+          const progress =
+            (currentScroll - triggerTop) / (window.innerHeight * 1.8);
           const isInTooltipRange = progress >= 0.7 && progress <= 0.89;
-          
+
           tooltipTimelines.forEach((timeline) => {
             if (isInTooltipRange) {
               timeline.progress(1);
