@@ -108,6 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create timelines after text elements exist
     createTooltipTimelines();
+    
+    // Create tooltip ScrollTriggers after timelines are ready
+    setTimeout(createTooltipScrollTriggers, 50);
   }
 
   setTimeout(setupTooltipText, 100); // Small delay to ensure layout is complete
@@ -121,9 +124,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (titleSplits) titleSplits.revert();
       if (descriptionSplits) descriptionSplits.revert();
 
-      // Clear existing timelines
+      // Clear existing timelines and ScrollTriggers
       tooltipTimelines.forEach((timeline) => timeline.kill());
       tooltipTimelines = [];
+      
+      tooltipScrollTriggers.forEach((trigger) => trigger.kill());
+      tooltipScrollTriggers = [];
 
       // Re-initialize with new layout
       setupTooltipText();
@@ -161,12 +167,11 @@ document.addEventListener("DOMContentLoaded", () => {
    * TOOLTIP ANIMATION CONFIGURATION
    * ===============================
    *
-   * Define when tooltips should appear based on scroll progress.
-   * Each tooltip has a trigger point and list of elements to animate.
+   * Define tooltip elements to animate. Tooltips now appear at 80%-99% scroll progress
+   * using dedicated ScrollTrigger instances instead of progress-based animation.
    */
   const tooltipSelectors = [
     {
-      trigger: 0.45, // Appear when scroll is 45% through the section
       elements: [
         ".tooltip:nth-child(2) .divider",
         ".tooltip:nth-child(2) .icon",
@@ -175,7 +180,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ],
     },
     {
-      trigger: 0.47, // Appear when scroll is 47% through the section (slight stagger)
       elements: [
         ".tooltip:nth-child(3) .divider",
         ".tooltip:nth-child(3) .icon",
@@ -192,6 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * Timelines will be created after text splitting is complete
    */
   let tooltipTimelines = [];
+  let tooltipScrollTriggers = []; // Track tooltip ScrollTrigger instances
 
   function createTooltipTimelines() {
     tooltipTimelines = tooltipSelectors.map(({ elements }) => {
@@ -768,7 +773,7 @@ document.addEventListener("DOMContentLoaded", () => {
        * A circular mask expands to reveal the second header underneath
        */
       const maskSize =
-        progress < 0.45
+        progress < 0.6
           ? 0 // Hidden before 45%
           : progress > 0.6
           ? 100 // Fully revealed after 60%
@@ -776,7 +781,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       gsap.to(".circular-mask", {
         clipPath: `circle(${maskSize}% at 50% 50%)`, // CSS clip-path for circular reveal
-        duration: 0.15,
+        duration: 2,
         ease: "power2.out",
       });
 
@@ -804,28 +809,8 @@ document.addEventListener("DOMContentLoaded", () => {
         ease: "none", // Linear easing for consistent scroll mapping
       });
 
-      /**
-       * TOOLTIP CONTENT REVEAL
-       * ======================
-       *
-       * Each tooltip's content animates in at its designated trigger point
-       * Using timelines ensures smooth forward/reverse animations
-       */
-      tooltipSelectors.forEach(({ trigger }, index) => {
-        const timeline = tooltipTimelines[index];
-
-        // Only animate if timeline exists (after text has been split)
-        if (timeline) {
-          if (progress >= trigger) {
-            // Calculate progress within the tooltip animation range (10% window)
-            const tooltipProgress = Math.min(1, (progress - trigger) / 0.1);
-            timeline.progress(tooltipProgress);
-          } else {
-            // Reset timeline when below trigger point
-            timeline.progress(0);
-          }
-        }
-      });
+      // Tooltip animations are now handled by dedicated ScrollTrigger instances
+      // See tooltip ScrollTrigger setup below the main scroll animation
 
       /**
        * 3D MODEL ROTATION ANIMATION (0% - 100% progress)
@@ -868,4 +853,72 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     },
   });
+
+  /**
+   * TOOLTIP SCROLL TRIGGERS
+   * =======================
+   *
+   * Dedicated ScrollTrigger instances for tooltip animations at 80%-99% progress.
+   * Each tooltip gets its own trigger for proper enter/leave handling.
+   */
+  function createTooltipScrollTriggers() {
+    // Only create triggers if timelines exist (after text splitting is complete)
+    if (tooltipTimelines.length === 0) {
+      // Retry after a short delay if timelines aren't ready yet
+      setTimeout(createTooltipScrollTriggers, 100);
+      return;
+    }
+
+    tooltipTimelines.forEach((timeline, index) => {
+      const trigger = ScrollTrigger.create({
+        trigger: ".product-overview",
+        start: "top top",
+        end: `+=${window.innerHeight * 1.5}`, // Match main scroll animation
+        scrub: false, // No scrubbing - discrete enter/leave animations
+        
+        onUpdate: ({ progress }) => {
+          // Tooltip visibility window: 80% - 99% of scroll progress
+          const isInTooltipRange = progress >= 0.8 && progress <= 0.99;
+          
+          if (isInTooltipRange) {
+            // Play tooltip animation when entering the range
+            timeline.play();
+          } else {
+            // Reverse tooltip animation when leaving the range
+            timeline.reverse();
+          }
+        },
+        
+        // Additional enter/leave callbacks for reliability
+        onEnter: ({ progress }) => {
+          if (progress >= 0.8) {
+            timeline.play();
+          }
+        },
+        
+        onLeave: ({ progress }) => {
+          if (progress > 0.99) {
+            timeline.reverse();
+          }
+        },
+        
+        onEnterBack: ({ progress }) => {
+          if (progress >= 0.8 && progress <= 0.99) {
+            timeline.play();
+          }
+        },
+        
+        onLeaveBack: ({ progress }) => {
+          if (progress < 0.8) {
+            timeline.reverse();
+          }
+        }
+      });
+      
+      // Store the ScrollTrigger instance for cleanup
+      tooltipScrollTriggers.push(trigger);
+    });
+  }
+
+
 });
