@@ -277,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Reverse header animation when scrolling back up
       gsap.to(".header-1 h1 .char > span", {
         y: "100%", // Move below visible area
-        duration: 1,
+        duration: 1.5,
         ease: "power3.inOut",
         stagger: 0.025,
       });
@@ -328,7 +328,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Global variables for 3D scene management
   let model, // The loaded 3D model
     currentRotation = 0, // Track model rotation for smooth animation
-    modelSize = 0; // Model dimensions for positioning calculations
+    modelSize = 0, // Model dimensions for positioning calculations
+    finalModelPosition = { x: 0, y: 0, z: 0 }, // Store the final position for entrance animation
+    currentScrollProgress = 0; // Track current scroll progress for resize handling
 
   /**
    * SCENE CREATION
@@ -471,6 +473,29 @@ document.addEventListener("DOMContentLoaded", () => {
   scene.add(fillLight);
 
   /**
+   * APPLY ENTRANCE ANIMATION STATE
+   * ==============================
+   *
+   * Apply the current entrance animation position based on scroll progress
+   */
+  function applyEntranceAnimationState() {
+    if (
+      model &&
+      finalModelPosition &&
+      modelSize &&
+      currentScrollProgress !== undefined
+    ) {
+      const entranceProgress = Math.max(
+        0,
+        Math.min(1, currentScrollProgress / 0.12)
+      ); // 0-12% of scroll
+      const currentY =
+        finalModelPosition.y - (1 - entranceProgress) * modelSize.y * 1.5;
+      model.position.y = currentY; // Set directly without animation during resize
+    }
+  }
+
+  /**
    * STEP 6: MODEL POSITIONING SYSTEM
    * =================================
    *
@@ -503,7 +528,14 @@ document.addEventListener("DOMContentLoaded", () => {
       -center.y + modelSize.y * modelConfig.position.verticalOffset; // Configurable vertical offset
     const newPositionZ = -center.z; // Center on Z-axis
 
-    model.position.set(newPositionX, newPositionY, newPositionZ);
+    // Store the final position for entrance animation
+    finalModelPosition = { x: newPositionX, y: newPositionY, z: newPositionZ };
+
+    // Set initial position below viewport for entrance animation
+    // Calculate how far below to start (1.5x model height below final position)
+    const startPositionY = newPositionY - modelSize.y * 1.5;
+
+    model.position.set(newPositionX, startPositionY, newPositionZ);
 
     /**
      * MODEL ROTATION
@@ -648,6 +680,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Reposition model for new screen size
     setupModel();
+
+    // Re-apply the current entrance animation state
+    applyEntranceAnimationState();
   });
 
   /**
@@ -674,6 +709,27 @@ document.addEventListener("DOMContentLoaded", () => {
      * different progress points for a choreographed experience.
      */
     onUpdate: ({ progress }) => {
+      // Track current scroll progress for resize handling
+      currentScrollProgress = progress;
+
+      /**
+       * 3D MODEL ENTRANCE ANIMATION (0% - 12% progress)
+       * ===============================================
+       *
+       * The 3D model moves up from below the viewport to its final position
+       */
+      if (model && finalModelPosition && modelSize) {
+        const entranceProgress = Math.max(0, Math.min(1, progress / 0.12)); // 0-12% of scroll
+        const currentY =
+          finalModelPosition.y - (1 - entranceProgress) * modelSize.y * 1.5;
+
+        gsap.to(model.position, {
+          y: currentY,
+          duration: 0.3,
+          ease: "power3.out",
+        });
+      }
+
       /**
        * MODEL CONTAINER REVEAL (15% - 25% progress)
        * ===========================================
@@ -682,7 +738,7 @@ document.addEventListener("DOMContentLoaded", () => {
        */
       const modelProgress = Math.max(0, Math.min(1, (progress - 0.15) / 0.1));
       gsap.to(".model-container", {
-        scale: progress < 0.15 ? 0.8 : 0.8 + 0.2 * modelProgress, // Scale from 0.8 to 1.0
+        scale: progress < 0.35 ? 0.8 : 0.8 + 0.2 * modelProgress, // Scale from 0.8 to 1.0
         duration: 0.2,
         ease: "power2.out",
       });

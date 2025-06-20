@@ -4,38 +4,41 @@
 
 ### Current Animation Timeline (scene.js)
 
-| Progress Range | Animation | Elements |
-|----------------|-----------|----------|
-| 0% - 15% | Initial state | Model container at scale 0.8 |
-| 15% - 25% | Model reveal | Model container scales to 1.0 |
-| 30% - 65% | Header 1 exit | `.header-1` slides left (-100%) |
-| 45% - 60% | Mask reveal | `.circular-mask` expands (0% to 100%) |
-| 45% - 90% | Header 2 journey | `.header-2` slides right to left |
-| 45% - 47% | Tooltip 1 | First tooltip content reveals |
-| 47% - 49% | Tooltip 2 | Second tooltip content reveals |
-| 0% - 100% | Model rotation | Continuous Y-axis rotation (2 full turns) |
+| Progress Range | Animation        | Elements                                  |
+| -------------- | ---------------- | ----------------------------------------- |
+| 0% - 12%       | Model entrance   | 3D model rises from below viewport        |
+| 0% - 15%       | Initial state    | Model container at scale 0.8              |
+| 15% - 25%      | Model reveal     | Model container scales to 1.0             |
+| 30% - 65%      | Header 1 exit    | `.header-1` slides left (-100%)           |
+| 45% - 60%      | Mask reveal      | `.circular-mask` expands (0% to 100%)     |
+| 45% - 90%      | Header 2 journey | `.header-2` slides right to left          |
+| 45% - 47%      | Tooltip 1        | First tooltip content reveals             |
+| 47% - 49%      | Tooltip 2        | Second tooltip content reveals            |
+| 0% - 100%      | Model rotation   | Continuous Y-axis rotation (2 full turns) |
 
 ### Key Configuration Objects
 
 #### Model Configuration
+
 ```javascript
 const modelConfig = {
-  scaleFactor: 4,                    // Overall model size
+  scaleFactor: 4, // Overall model size
   cameraDistance: { mobile: 4, desktop: 3 },
-  position: { 
-    horizontalOffset: 0.4,           // Desktop left offset
-    verticalOffset: -0.05            // Vertical positioning
+  position: {
+    horizontalOffset: 0.4, // Desktop left offset
+    verticalOffset: -0.05, // Vertical positioning
   },
-  rotation: { mobile: 0, desktop: -15 }
+  rotation: { mobile: 0, desktop: -15 },
 };
 ```
 
 #### Animation Options
+
 ```javascript
 const animOptions = {
   duration: 1,
   ease: "power3.inOut",
-  stagger: 0.025
+  stagger: 0.025,
 };
 ```
 
@@ -72,6 +75,7 @@ const animOptions = {
 ## 🔧 Common Modification Scenarios
 
 ### 1. Adjusting Model Position
+
 ```javascript
 // In modelConfig object
 position: {
@@ -81,6 +85,7 @@ position: {
 ```
 
 ### 2. Changing Animation Speed
+
 ```javascript
 // In ScrollTrigger configuration
 end: `+=${window.innerHeight * 2}`,  // Increase multiplier for slower scroll
@@ -90,30 +95,52 @@ const headerProgress = (progress - 0.3) / 0.2;  // Decrease divisor for faster
 ```
 
 ### 3. Adding New Scroll-Based Effects
+
 ```javascript
 // Add to onUpdate callback
-if (progress >= 0.8) {  // New trigger at 80%
+if (progress >= 0.8) {
+  // New trigger at 80%
   const effectProgress = Math.min(1, (progress - 0.8) / 0.1);
   gsap.to(".new-element", {
     opacity: effectProgress,
-    scale: 1 + (effectProgress * 0.2),
-    duration: 0.3
+    scale: 1 + effectProgress * 0.2,
+    duration: 0.3,
   });
 }
 ```
 
 ### 4. Modifying 3D Model Properties
+
 ```javascript
 // In model loading success callback
 model.traverse((node) => {
   if (node.isMesh && node.material.isMeshStandardMaterial) {
     Object.assign(node.material, {
-      roughness: 0.2,     // 0 = mirror, 1 = completely rough
-      metalness: 0.9,     // 0 = non-metal, 1 = full metal
-      envMapIntensity: 1.5 // Environment reflection strength
+      roughness: 0.2, // 0 = mirror, 1 = completely rough
+      metalness: 0.9, // 0 = non-metal, 1 = full metal
+      envMapIntensity: 1.5, // Environment reflection strength
     });
   }
 });
+```
+
+### 5. Modifying Model Entrance Animation
+
+```javascript
+// In main scroll animation onUpdate callback
+if (model && finalModelPosition && modelSize) {
+  const entranceProgress = Math.max(0, Math.min(1, progress / 0.12)); // 0-12% of scroll
+  const currentY = finalModelPosition.y - (1 - entranceProgress) * modelSize.y * 1.5;
+  
+  gsap.to(model.position, {
+    y: currentY,
+    duration: 0.3,
+    ease: "power3.out", // Change easing curve
+  });
+}
+
+// Adjust entrance timing by modifying the divisor (0.12 = 12% of scroll)
+// Adjust starting distance by modifying the multiplier (1.5 = 1.5x model height below)
 ```
 
 ## 🚨 Critical Constraints Reminder
@@ -128,21 +155,24 @@ model.traverse((node) => {
 ## 🎨 Animation Best Practices
 
 ### GSAP Performance Tips
+
 - Use `transform` properties: `x`, `y`, `rotation`, `scale`
 - Avoid layout-triggering properties: `left`, `top`, `width`, `height`
 - Use `will-change: transform` on animated elements (already set in CSS)
 - Utilize `ease` curves: `"power2.out"`, `"power3.inOut"`, `"back.out(1.7)"`
 
 ### Three.js Optimization
+
 - Limit geometry complexity for real-time performance
 - Use frustum culling (already enabled)
 - Minimize draw calls through material sharing
 - Update shadow maps manually when needed
 
 ### ScrollTrigger Efficiency
+
 - Use `scrub` for smooth scroll-following animations
 - Batch DOM reads/writes in `onUpdate` callbacks
 - Leverage `pin` for complex scroll sections
 - Use `invalidateOnRefresh` for responsive behavior
 
-This guide provides the technical foundation for enhancing the 3D scene while maintaining the sophisticated choreography already in place. 
+This guide provides the technical foundation for enhancing the 3D scene while maintaining the sophisticated choreography already in place.
