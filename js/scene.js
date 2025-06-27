@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
    * - ScrollTrigger: Trigger animations based on scroll position
    * - SplitText: Split text into individual characters/lines for animation
    */
-  gsap.registerPlugin(ScrollTrigger, SplitText);
+  gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin);
 
   /**
    * STEP 2: SMOOTH SCROLLING SETUP
@@ -65,8 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
     type: "chars",
     charsClass: "char", // CSS class applied to each character wrapper
   });
-
-
 
   // Function to properly split tooltip text after layout is ready
   function initializeTooltipText() {
@@ -146,21 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
     (char) => (char.innerHTML = `<span>${char.innerHTML}</span>`)
   );
 
-
-
   // Note: Tooltip line wrapping is handled in the setTimeout above after layout is ready
-
-  /**
-   * ANIMATION CONFIGURATION
-   * =======================
-   *
-   * Define reusable animation settings for consistent timing and easing
-   */
-  const animOptions = {
-    duration: 1, // Animation duration in seconds
-    ease: "power3.inOut", // Smooth easing curve (starts slow, speeds up, slows down)
-    stagger: 0.025, // Delay between each element (creates wave effect)
-  };
 
   /**
    * TOOLTIP ANIMATION CONFIGURATION
@@ -202,14 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const timeline = gsap.timeline({ paused: true });
 
       // Separate elements by type for different animations
-      const dividerElements = elements.filter((el) => el.includes(".divider"));
+      const dividerElements = document.querySelectorAll(".divider path");
       const iconElements = elements.filter((el) => el.includes(".icon"));
       const textElements = elements.filter(
         (el) => !el.includes(".icon") && !el.includes(".divider")
       );
 
       // Set initial states
-      gsap.set(dividerElements, { scaleX: 0 }); // Dividers start with 0 width
+      gsap.set(dividerElements, { drawSVG: "0%" }); // Dividers start with 0 width
       gsap.set(textElements, { y: "125%" }); // Text elements start below viewport
       gsap.set(iconElements, { y: -40, opacity: 0 }); // Icons start above with 0 opacity
 
@@ -218,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .to(
           dividerElements,
           {
-            scaleX: 1,
+            drawSVG: "100%",
             duration: 1.5,
             ease: "power3.out",
           },
@@ -270,22 +254,25 @@ document.addEventListener("DOMContentLoaded", () => {
     opacity: 0,
   });
 
-
-
   // Set initial tooltip positioning
   gsap.set(".tooltip:nth-child(2)", {
     position: "absolute",
     bottom: "2rem",
-    left: "2rem",
+    left: "4rem",
   });
 
   gsap.set(".tooltip:nth-child(3)", {
     position: "absolute",
     top: "2rem",
-    right: "2rem",
+    right: "6rem",
   });
 
-  
+  // Set initial state for pinned fixed text - hidden initially
+  gsap.set(".pinned-fixed-text", {
+    opacity: 0,
+    y: 30, // Start slightly below
+    zIndex: 100, // Ensure it's above other elements
+  });
 
   ScrollTrigger.create({
     trigger: ".product-overview",
@@ -307,6 +294,55 @@ document.addEventListener("DOMContentLoaded", () => {
         ease: "power3.inOut",
         stagger: 0.025,
       });
+    },
+  });
+
+  /**
+   * PINNED FIXED TEXT ANIMATION
+   * ===========================
+   * 
+   * Shows the fixed text element just before the circular mask animation
+   * and properly reverses when scrolling back up past the mask animation
+   */
+  ScrollTrigger.create({
+    trigger: ".product-overview",
+    start: "top top",
+    end: `+=${window.innerHeight * 1.8}`, // Match main scroll animation timeline
+    scrub: false, // No scrubbing for discrete show/hide behavior
+
+    onUpdate: ({ progress }) => {
+      // Show text at 40% progress (7% before circular mask at 47%)
+      // Hide text at 65% progress (5% after circular mask completes at 60%)
+      const shouldShowText = progress >= 0.4 && progress <= 0.65;
+
+      if (shouldShowText) {
+        // Animate text in
+        gsap.to(".pinned-fixed-text", {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power3.out",
+        });
+      } else {
+        // Animate text out
+        gsap.to(".pinned-fixed-text", {
+          opacity: 0,
+          y: 30,
+          duration: 0.4,
+          ease: "power3.in",
+        });
+      }
+    },
+
+    // Handle initial state on page load/refresh
+    onRefresh: ({ progress }) => {
+      const shouldShowText = progress >= 0.4 && progress <= 0.65;
+      
+      if (shouldShowText) {
+        gsap.set(".pinned-fixed-text", { opacity: 1, y: 0 });
+      } else {
+        gsap.set(".pinned-fixed-text", { opacity: 0, y: 30 });
+      }
     },
   });
 
