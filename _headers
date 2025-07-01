@@ -5,7 +5,7 @@
 # Global headers for all files
 /*
   # Security Headers
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
@@ -13,10 +13,12 @@
   # Performance Headers
   X-DNS-Prefetch-Control: on
   
-  # CORS Headers for cross-origin requests
-  Access-Control-Allow-Origin: *
-  Access-Control-Allow-Methods: GET, POST, OPTIONS
-  Access-Control-Allow-Headers: Content-Type, Authorization
+  # CORS Headers for cross-origin requests (specifically allow Webflow domain)
+  Access-Control-Allow-Origin: https://beanoss-spectacular-site.webflow.io
+  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+  Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+  Access-Control-Allow-Credentials: false
+  Access-Control-Max-Age: 86400
 
 # 3D Model files (.glb, .gltf) - Critical for Three.js loading
 /assets/models/*
@@ -31,7 +33,19 @@
 /js/*
   Content-Type: application/javascript
   Cache-Control: public, max-age=31536000, immutable
-  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Origin: https://beanoss-spectacular-site.webflow.io
+  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+  Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
+  Access-Control-Max-Age: 86400
+
+# Vite build assets (bundled JS files)
+/assets/*
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: https://beanoss-spectacular-site.webflow.io
+  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+  Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+  Access-Control-Max-Age: 86400
 
 # CSS files - Webflow styles
 /css/*
