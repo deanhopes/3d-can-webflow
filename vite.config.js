@@ -31,6 +31,11 @@ export default defineConfig({
    */
   build: {
     rollupOptions: {
+      input: './js/scene.js', // Point to your actual scene.js file
+      output: {
+        entryFileNames: 'assets/scene-[hash].js', // Name the output file clearly
+        format: 'es', // ES modules format for cross-origin loading
+      },
       plugins: [
         {
           name: 'copy-headers',
