@@ -1,0 +1,87 @@
+# Netlify Headers Configuration
+# =============================
+# This file configures HTTP headers for optimal security, performance, and compatibility
+
+# Global headers for all files
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  
+  # Performance Headers
+  X-DNS-Prefetch-Control: on
+  
+  # CORS Headers for cross-origin requests
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+
+# 3D Model files (.glb, .gltf) - Critical for Three.js loading
+/assets/models/*
+  Content-Type: model/gltf-binary
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+  Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+  Access-Control-Max-Age: 86400
+  Cache-Control: public, max-age=31536000, immutable
+
+# JavaScript files - ES6 modules and libraries
+/js/*
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# CSS files - Webflow styles
+/css/*
+  Content-Type: text/css
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# Image assets - Optimized caching
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# HTML files - Short cache for updates
+/*.html
+  Cache-Control: public, max-age=3600
+  X-Frame-Options: SAMEORIGIN
+
+# Favicon and web app manifest
+/favicon.ico
+  Cache-Control: public, max-age=86400
+
+/webclip.png
+  Cache-Control: public, max-age=86400
+
+# Node modules and package files (if accidentally deployed)
+/node_modules/*
+  X-Robots-Tag: noindex, nofollow
+
+# Development files
+/package*.json
+  X-Robots-Tag: noindex, nofollow
+
+# Specific security for sensitive files
+/.env*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
+
+# WOFF/WOFF2 font files (if any)
+/*.woff
+  Content-Type: font/woff
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/*.woff2
+  Content-Type: font/woff2
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# SVG files
+/*.svg
+  Content-Type: image/svg+xml
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: * 
