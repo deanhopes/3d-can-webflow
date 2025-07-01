@@ -38,14 +38,24 @@
   Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept
   Access-Control-Max-Age: 86400
 
-# Vite build assets (bundled JS files)
+# Vite build assets (bundled JS files) - ES6 modules need specific CORS handling
 /assets/*
-  Content-Type: application/javascript
+  Content-Type: application/javascript; charset=utf-8
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: https://beanoss-spectacular-site.webflow.io
   Access-Control-Allow-Methods: GET, HEAD, OPTIONS
   Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
   Access-Control-Max-Age: 86400
+  Access-Control-Allow-Credentials: false
+
+# Handle preflight OPTIONS requests for ES6 modules
+/assets/*.js
+  Content-Type: application/javascript; charset=utf-8
+  Access-Control-Allow-Origin: https://beanoss-spectacular-site.webflow.io
+  Access-Control-Allow-Methods: GET, HEAD, OPTIONS
+  Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control
+  Access-Control-Max-Age: 86400
+  Access-Control-Allow-Credentials: false
 
 # CSS files - Webflow styles
 /css/*
