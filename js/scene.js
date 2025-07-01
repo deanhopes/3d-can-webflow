@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * PINNED FIXED TEXT ANIMATION
    * ===========================
-   * 
+   *
    * Shows the fixed text element just before the circular mask animation
    * and properly reverses when scrolling back up past the mask animation
    */
@@ -337,7 +337,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Handle initial state on page load/refresh
     onRefresh: ({ progress }) => {
       const shouldShowText = progress >= 0.4 && progress <= 0.65;
-      
+
       if (shouldShowText) {
         gsap.set(".pinned-fixed-text", { opacity: 1, y: 0 });
       } else {

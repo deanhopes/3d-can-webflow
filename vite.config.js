@@ -12,8 +12,9 @@
  * - Grasp development vs production optimization
  */
 
-// Import Vite's configuration function
+// Import Vite's configuration function and file system utilities
 import { defineConfig } from "vite";
+import { copyFileSync } from "fs";
 
 /**
  * Export Vite configuration object
@@ -22,6 +23,30 @@ import { defineConfig } from "vite";
  * defineConfig provides TypeScript intellisense and validation for the config object
  */
 export default defineConfig({
+  /**
+   * BUILD CONFIGURATION
+   * ===================
+   * 
+   * Configuration for production builds
+   */
+  build: {
+    rollupOptions: {
+      plugins: [
+        {
+          name: 'copy-headers',
+          writeBundle() {
+            // Copy _headers file to dist directory for Netlify
+            try {
+              copyFileSync('_headers', 'dist/_headers');
+              console.log('✅ _headers file copied to dist/');
+            } catch (error) {
+              console.warn('⚠️ Could not copy _headers file:', error.message);
+            }
+          }
+        }
+      ]
+    }
+  },
   /**
    * DEVELOPMENT SERVER CONFIGURATION
    * =================================
