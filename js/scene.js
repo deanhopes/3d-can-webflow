@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
    */
 
   // Split the main header into individual characters for staggered animation
-  const headerSplit = new SplitText(".header-1 h1", {
+  const headerSplit = new SplitText(".header-1 h3", {
     type: "chars",
     charsClass: "char", // CSS class applied to each character wrapper
   });
@@ -279,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
     start: "75% bottom", // Start when section is 75% visible from bottom
     onEnter: () => {
       // Animate header characters
-      gsap.to(".header-1 h1 .char > span", {
+      gsap.to(".header-1 h3 .char > span", {
         y: "0%", // Move to normal position
         duration: 1,
         ease: "power3.inOut",
@@ -288,7 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     onLeaveBack: () => {
       // Reverse header animation when scrolling back up
-      gsap.to(".header-1 h1 .char > span", {
+      gsap.to(".header-1 h3 .char > span", {
         y: "100%", // Move below visible area
         duration: 1.5,
         ease: "power3.inOut",
@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
     start: "75% bottom", // Start when section is 75% visible from bottom
     onEnter: () => {
       // Animate header characters
-      gsap.to(".header-1 h1 .char > span", {
+      gsap.to(".header-1 h3 .char > span", {
         y: "0%", // Move to normal position
         duration: 1,
         ease: "power3.inOut",
@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     onLeaveBack: () => {
       // Reverse header animation when scrolling back up
-      gsap.to(".header-1 h1 .char > span", {
+      gsap.to(".header-1 h3 .char > span", {
         y: "100%", // Move below visible area
         duration: 1.5,
         ease: "power3.inOut",

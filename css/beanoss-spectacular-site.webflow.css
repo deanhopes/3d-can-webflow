@@ -1,7 +1,23 @@
+@font-face {
+  font-family: Tt Interphases Pro Mono Trial;
+  src: url('../fonts/TT_Interphases_Pro_Mono_Trial_Regular.woff2') format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Drukwide Trial;
+  src: url('../fonts/DrukWide-Bold-Trial.otf') format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --colors--background: var(--_color---neutral--black);
-  --_typography---paragraph-body--font: var(--_typography---fonts--primary-font);
-  --_color---neutral--black: #1d1c1a;
+  --_typography---paragraph-body--font: var(--_typography---fonts--secondary-font);
+  --_color---neutral--black: #12161c;
   --_responsive---font-size--body: 1rem;
   --_typography---paragraph-body--line-height: 1.6;
   --_typography---paragraph-body--font-weight: 400;
@@ -9,7 +25,7 @@
   --_typography---h1--bottom-margin: .2em;
   --_typography---h1--font: var(--_typography---fonts--primary-font);
   --_responsive---font-size--h1: 5.5rem;
-  --_typography---h1--line-height: 1;
+  --_typography---h1--line-height: .8;
   --_typography---h1--font-weight: 500;
   --_typography---h1--letter-spacing: -.02em;
   --_typography---h2--bottom-margin: .3em;
@@ -47,7 +63,7 @@
   --_responsive---padding--section: 1rem;
   --colors--text: var(--_color---neutral--white);
   --_color---neutral--light-gray: #dfddd6;
-  --_color---neutral--dark-gray: #302f2c;
+  --_color---neutral--dark-gray: #262a2f;
   --_color---neutral--white: white;
   --_size---4rem\<deleted\|variable-9c0e34bf-d979-3906-a451-347bf3bf13b2\>: 4rem;
   --_size---2rem\<deleted\|variable-703e76dd-22c1-0e62-be30-102e06bdb527\>: 2rem;
@@ -77,24 +93,24 @@
   --_components---input--line-height: 1.5em;
   --_components---input--font-weight: 400;
   --_components---input--letter-spacing: 0em;
-  --_color---primary--orange: #d14424;
+  --_color---primary--orange: #d92e30;
   --_components---input-label--font: var(--_typography---fonts--primary-font);
   --_components---input-label--font-size: .9rem;
   --_components---input-label--line-height: 1em;
   --_components---input-label--font-weight: 500;
   --_components---input-label--letter-spacing: 0em;
   --_typography---eyebrow--bottom-margin: 1.5em;
-  --_typography---eyebrow--font: var(--_typography---fonts--primary-font);
+  --_typography---eyebrow--font: var(--_typography---fonts--secondary-font);
   --_responsive---font-size--eyebrow: .8rem;
   --_typography---eyebrow--line-height: 1.2;
   --_typography---eyebrow--font-weight: 500;
   --_typography---paragraph-sm--bottom-margin: 1em;
-  --_typography---paragraph-sm--font: var(--_typography---fonts--primary-font);
+  --_typography---paragraph-sm--font: var(--_typography---fonts--secondary-font);
   --_responsive---font-size--paragraph-sm: .9rem;
   --_typography---paragraph-sm--line-height: 1.5;
   --_typography---paragraph-sm--font-weight: 400;
   --_typography---paragraph-sm--letter-spacing: 0em;
-  --_typography---paragraph-lg--bottom-margin: 1em;
+  --_typography---paragraph-lg--bottom-margin: 0em;
   --_typography---paragraph-lg--font: var(--_typography---fonts--primary-font);
   --_responsive---font-size--paragraph-lg: 1.25rem;
   --_typography---paragraph-lg--line-height: 1.5;
@@ -119,12 +135,13 @@
   --_size---5rem\<deleted\|variable-ff14b77f-fe78-09a6-d1f0-e9e7c84aae7c\>: 5rem;
   --_size---0-25rem\<deleted\|variable-2d47388d-3251-c56b-03c9-35dfc0a59c39\>: .25rem;
   --_size---3rem\<deleted\|variable-69c16ee0-18a3-4590-ef2c-d3d00d2064c9\>: 3rem;
-  --_size---0-75rem\<deleted\|variable-51df6ead-a71c-263d-332f-348c569f6d5f\>: .75rem;
   --_size---1-5rem\<deleted\|variable-f3ca9317-f658-e5ae-7950-f14c04b8bdeb\>: 1.5rem;
   --_color---secondary--yellow: #f8d47a;
   --_color---secondary--blue: #0073e6;
+  --_size---0-75rem\<deleted\|variable-51df6ead-a71c-263d-332f-348c569f6d5f\>: .75rem;
   --colors--color: white;
-  --_typography---fonts--primary-font: "Inter Tight", sans-serif;
+  --_typography---fonts--primary-font: "Drukwide Trial", Arial, sans-serif;
+  --_typography---fonts--secondary-font: "Tt Interphases Pro Mono Trial", Georgia, sans-serif;
   --_typography---paragraph-xl--letter-spacing: 0em;
   --_typography---eyebrow--letter-spacing: .1em;
 }
@@ -341,12 +358,20 @@ figcaption {
   margin-top: 0;
   margin-bottom: var(--_typography---h4--letter-spacing);
   font-family: var(--_typography---h1--font);
-  font-size: 15vw;
-  line-height: var(--_typography---h1--line-height);
+  font-size: 7vw;
+  line-height: 1.3;
   font-weight: var(--_typography---h1--font-weight);
   letter-spacing: var(--_typography---h1--letter-spacing);
+  text-transform: uppercase;
   width: 100%;
-  display: block;
+  height: 8rem;
+  padding-left: 4rem;
+}
+
+.h1.header-caps.u-text-center.u-text-white {
+  font-size: var(--_responsive---font-size--h1);
+  line-height: var(--_typography---h1--line-height);
+  height: auto;
 }
 
 .h2 {
@@ -487,8 +512,12 @@ figcaption {
   display: flex;
 }
 
+.section.product-overview {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .section.outro {
-  background-color: var(--colors--text);
   color: var(--colors--background);
   justify-content: center;
   align-items: center;
@@ -509,6 +538,11 @@ figcaption {
   justify-content: space-between;
   align-items: center;
   display: flex;
+}
+
+.container.u-d-flex {
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .container.u-d-flex.u-space-between {
@@ -1191,12 +1225,12 @@ figcaption {
 }
 
 .styles__nav-version {
-  background-color: var(--colors--primary-accent);
-  color: var(--_color---neutral--white);
+  color: var(--colors--background);
   text-transform: none;
+  background-color: #0f0;
   border-radius: 4px;
-  width: 2.5rem;
-  padding: .35em 1em .4em;
+  width: 100%;
+  padding: .4em 1em;
   font-size: .7em;
   line-height: 1em;
   display: inline-block;
@@ -1297,6 +1331,10 @@ figcaption {
   line-height: var(--_typography---paragraph-lg--line-height);
   font-weight: var(--_typography---paragraph-lg--font-weight);
   letter-spacing: var(--_typography---paragraph-lg--letter-spacing);
+}
+
+.paragraph-lg.nav-menu-txt {
+  margin-bottom: .05em;
 }
 
 .paragraph-xl {
@@ -1765,13 +1803,11 @@ figcaption {
 
 .nav {
   z-index: 999;
-  border-bottom: 1px solid var(--_color---neutral--dark-gray);
-  background-color: var(--colors--background);
   color: var(--colors--text);
   width: 100%;
   padding-top: 10px;
   padding-bottom: 10px;
-  display: none;
+  display: block;
   position: fixed;
   top: 0;
 }
@@ -1937,7 +1973,7 @@ figcaption {
 }
 
 .nav-menu_btn {
-  padding: var(--_size---0-75rem\<deleted\|variable-51df6ead-a71c-263d-332f-348c569f6d5f\>);
+  height: 1rem;
 }
 
 .nav-menu_btn-bar {
@@ -1978,6 +2014,8 @@ figcaption {
 .footer-social_list {
   grid-column-gap: var(--_size---1rem\<deleted\|variable-461c7c57-ec3c-d23c-768b-c6de52a540e5\>);
   grid-row-gap: var(--_size---1rem\<deleted\|variable-461c7c57-ec3c-d23c-768b-c6de52a540e5\>);
+  justify-content: center;
+  align-items: center;
   margin-bottom: 0;
   display: flex;
 }
@@ -2054,7 +2092,8 @@ figcaption {
 }
 
 .icon {
-  width: 100%;
+  justify-content: center;
+  align-items: center;
   font-size: 1em;
   font-style: normal;
   display: inline-flex;
@@ -2244,30 +2283,36 @@ figcaption {
 .tooltip {
   grid-column-gap: .5rem;
   grid-row-gap: .5rem;
-  color: var(--_color---neutral--black);
+  color: var(--_color---neutral--white);
   flex-flow: column;
   flex: 1;
   justify-content: flex-start;
   align-items: flex-start;
+  width: 35rem;
   display: flex;
 }
 
+.tooltip.align-right {
+  justify-content: flex-start;
+  align-items: flex-end;
+  margin-top: 16rem;
+}
+
 .divider {
-  background-color: var(--colors--primary-accent);
   width: 100%;
-  height: 1px;
   position: relative;
-  transform: scaleX(0);
 }
 
 .title {
+  color: var(--colors--background);
   width: 100%;
 }
 
 .description {
   color: var(--_color---neutral--white);
   justify-content: flex-end;
-  align-items: flex-start;
+  align-items: center;
+  width: 100%;
   display: flex;
 }
 
@@ -2278,9 +2323,8 @@ figcaption {
 
 .model-container {
   z-index: 100;
-  cursor: none;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -2293,9 +2337,10 @@ figcaption {
 
 .paragraph {
   color: var(--_color---neutral--black);
+  text-transform: uppercase;
+  text-wrap: pretty;
   justify-content: flex-end;
   align-items: flex-start;
-  width: 70%;
 }
 
 .header-caps {
@@ -2303,6 +2348,11 @@ figcaption {
   margin-bottom: 0;
   font-size: 8vw;
   font-weight: 700;
+}
+
+.header-caps.u-text-center {
+  font-size: 6vw;
+  line-height: var(--_typography---h1--line-height);
 }
 
 .styles__hero-paragraph {
@@ -2315,6 +2365,211 @@ figcaption {
 
 .styles__header_container {
   width: 90%;
+}
+
+.styles__model_gradient {
+  background-image: linear-gradient(0deg, var(--colors--background), #1d1c1a00);
+  width: 100%;
+  height: 8rem;
+  position: absolute;
+  inset: auto 0% 0%;
+}
+
+.styles__h2_pin {
+  font-size: var(--_responsive---font-size--h4);
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+.frame-1000003148 {
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 796.799px;
+  text-decoration: none;
+  display: flex;
+}
+
+.frame-1000003138 {
+  grid-row-gap: 8px;
+  background-color: #000;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 9.6px;
+  text-decoration: none;
+  display: flex;
+}
+
+.logo {
+  object-fit: cover;
+  height: 1.7rem;
+  overflow: hidden;
+}
+
+.frame-1000003108 {
+  grid-column-gap: 17.6px;
+  flex: 0 auto;
+  justify-content: flex-start;
+  align-items: center;
+  text-decoration: none;
+  display: flex;
+}
+
+.text {
+  color: #f5f3f0;
+  text-align: center;
+  letter-spacing: -.1em;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 77%;
+  text-decoration: none;
+}
+
+.group-4997 {
+  object-fit: cover;
+  justify-content: center;
+  align-items: center;
+  width: 16.8px;
+  height: 10.4px;
+  text-decoration: none;
+  display: flex;
+}
+
+.body {
+  background-color: var(--colors--background);
+}
+
+.nav-container {
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 61px;
+  padding-left: 40px;
+  padding-right: 40px;
+  text-decoration: none;
+  display: flex;
+}
+
+.logo-container {
+  grid-row-gap: 8px;
+  background-color: #000;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  text-decoration: none;
+  display: flex;
+}
+
+.frame-1000003151 {
+  grid-column-gap: 17.6px;
+  flex: 0 auto;
+  justify-content: flex-start;
+  align-items: center;
+  text-decoration: none;
+  display: flex;
+}
+
+.text-2 {
+  color: #f5f3f0;
+  text-align: center;
+  letter-spacing: -.1em;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.group-4998 {
+  object-fit: cover;
+  justify-content: center;
+  align-items: center;
+  width: 16.8px;
+  height: 10.4px;
+  text-decoration: none;
+  display: flex;
+}
+
+.menu-button {
+  grid-column-gap: 1rem;
+  grid-row-gap: 1rem;
+  cursor: pointer;
+  background-color: #000;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  text-decoration: none;
+  display: flex;
+}
+
+.styles__hero-container {
+  width: 80%;
+}
+
+.header-1-copy {
+  justify-content: center;
+  align-items: center;
+  width: 307vw;
+  height: 100svh;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  display: flex;
+  position: relative;
+  transform: translateX(0%);
+}
+
+.tooltip-icon_title {
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  display: flex;
+}
+
+.pinned-fixed-text {
+  grid-column-gap: 16px;
+  grid-row-gap: 16px;
+  grid-template-rows: auto auto;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-columns: 1fr;
+  place-content: space-between;
+  width: 100vw;
+  height: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: grid;
+  position: fixed;
+  inset: 0%;
+}
+
+.tooltip-colour {
+  color: var(--_color---neutral--black);
+}
+
+.spacer {
+  width: 100%;
+  height: 1rem;
+}
+
+.link {
+  text-transform: uppercase;
+}
+
+.footer-date {
+  justify-content: flex-end;
+  align-items: center;
+  display: flex;
+}
+
+.footer-info {
+  grid-column-gap: 1rem;
+  grid-row-gap: 1rem;
+  display: flex;
 }
 
 @media screen and (max-width: 991px) {
@@ -2894,4 +3149,26 @@ figcaption {
   }
 }
 
+#w-node-_9d465ac9-19a1-84ee-e2dd-100fc89d044a-2a9c55da {
+  grid-area: 2 / 1 / 3 / 2;
+}
 
+#w-node-b9925b4a-d949-ae14-23c4-c347c5dd3d89-2a9c55da {
+  grid-area: 2 / 2 / 3 / 3;
+}
+
+
+@font-face {
+  font-family: 'Tt Interphases Pro Mono Trial';
+  src: url('../fonts/TT_Interphases_Pro_Mono_Trial_Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Drukwide Trial';
+  src: url('../fonts/DrukWide-Bold-Trial.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
